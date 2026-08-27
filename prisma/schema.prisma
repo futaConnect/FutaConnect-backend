@@ -15,6 +15,7 @@ model User {
   role         Role
   createdAt    DateTime @default(now())
   consumerProfile ConsumerProfile?
+  providerProfile ProviderProfile?
 }
 
 model ConsumerProfile {
@@ -31,4 +32,38 @@ model ConsumerProfile {
 enum Role {
   PROVIDER
   CONSUMER
+}
+
+enum AvailabilityStatus {
+  ACTIVE
+  BUSY
+  INACTIVE
+}
+
+enum VerificationTier {
+  STEP1
+  STEP2
+  STEP3
+}
+
+model ProviderProfile {
+  id                 String              @id @default(uuid())
+  userId             String              @unique
+  user               User                @relation(fields: [userId], references: [id])
+
+  legalName          String              // private, admin-visible only
+  bio                String
+  skillLevel         String
+  campusLocation     String
+  availabilityStatus AvailabilityStatus  @default(ACTIVE)
+  phoneNumber        String
+  whatsappNumber     String
+  socialLinks        String[]            @default([])
+  department         String
+  profilePictureUrl  String
+
+  verificationTier   VerificationTier    @default(STEP3)
+  isVerified         Boolean             @default(false)
+
+  createdAt          DateTime            @default(now())
 }

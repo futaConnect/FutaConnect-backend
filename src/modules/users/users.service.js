@@ -7,4 +7,10 @@ async function createConsumerProfile(userId, { realName, campusLocation }) {
   });
 }
 
-module.exports = { createConsumerProfile };
+async function createProviderProfile(userId, data) {
+  return prisma.providerProfile.create({
+    data: { userId, ...data },
+  });
+}
+
+module.exports = { createConsumerProfile,  createProviderProfile };

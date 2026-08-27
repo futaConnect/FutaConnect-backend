@@ -1,4 +1,4 @@
-const { createConsumerProfile } = require('./users.service');
+const { createConsumerProfile, createProviderProfile } = require('./users.service');
 
 async function createMyConsumerProfile(req, res) {
   try {
@@ -23,4 +23,31 @@ async function createMyConsumerProfile(req, res) {
   }
 }
 
-module.exports = { createMyConsumerProfile };
+async function createMyProviderProfile(req, res) {
+  try {
+    if (req.user.role !== 'PROVIDER') {
+      return res.status(403).json({ error: 'only provider accounts can create a provider profile' });
+    }
+
+    const { legalName, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl, socialLinks } = req.body;
+
+    if (!legalName || !bio || !skillLevel || !campusLocation || !phoneNumber || !whatsappNumber || !department || !profilePictureUrl) {
+      return res.status(400).json({ error: 'missing required provider fields' });
+    }
+
+    const profile = await createProviderProfile(req.user.userId, {
+      legalName, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl,
+      socialLinks: socialLinks || [],
+    });
+
+    res.status(201).json(profile);
+  } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: 'profile already exists for this user' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { createMyConsumerProfile, createMyProviderProfile };
