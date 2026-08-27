@@ -7,9 +7,9 @@ async function createMyConsumerProfile(req, res) {
       return res.status(403).json({ error: 'only consumer accounts can create a consumer profile' });
     }
 
-    const { realName, campusLocation } = req.body;
-    if (!realName || !campusLocation) {
-      return res.status(400).json({ error: 'realName and campusLocation are required' });
+    const { realName, campusLocation, department } = req.body;
+    if (!realName || !campusLocation || !department) {
+      return res.status(400).json({ error: 'realName and campusLocation and department are required' });
     }
 
     const profile = await createConsumerProfile(req.user.userId, { realName, campusLocation });

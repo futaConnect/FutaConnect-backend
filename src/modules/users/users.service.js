@@ -1,9 +1,9 @@
 const prisma = require('../../config/db');
 
 // creates the consumer profile for the currently logged-in user
-async function createConsumerProfile(userId, { realName, campusLocation }) {
+async function createConsumerProfile(userId, { realName, campusLocation, department }) {
   return prisma.consumerProfile.create({
-    data: { userId, realName, campusLocation },
+    data: { userId, realName, campusLocation, department },
   });
 }
 

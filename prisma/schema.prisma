@@ -25,10 +25,10 @@ model ConsumerProfile {
 
   realName       String   // private — never shown to providers
   campusLocation String
+  department     String   // private, admin-only — for scammer tracking (agreed w/ co-founder)
 
   createdAt      DateTime @default(now())
 }
-
 enum Role {
   PROVIDER
   CONSUMER
