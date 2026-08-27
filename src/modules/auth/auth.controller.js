@@ -1,0 +1,25 @@
+// src/modules/auth/auth.controller.js
+const { registerUser } = require('./auth.service');
+
+async function register(req, res) {
+  try {
+    const { email, username, password, role } = req.body;
+
+    // basic presence check — proper validation comes later as its own step
+    if (!email || !username || !password || !role) {
+      return res.status(400).json({ error: 'email, username, password, and role are all required' });
+    }
+
+    const user = await registerUser({ email, username, password, role });
+    res.status(201).json(user);
+  } catch (err) {
+    // e.g. duplicate email/username hits Prisma's unique constraint
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: `${err.meta.target} already in use` });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { register };
