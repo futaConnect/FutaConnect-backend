@@ -29,14 +29,14 @@ async function createMyProviderProfile(req, res) {
       return res.status(403).json({ error: 'only provider accounts can create a provider profile' });
     }
 
-    const { legalName, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl, socialLinks } = req.body;
+    const { legalName, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl, socialLinks, username } = req.body;
 
-    if (!legalName || !bio || !skillLevel || !campusLocation || !phoneNumber || !whatsappNumber || !department || !profilePictureUrl) {
+    if (!legalName || !username|| !bio || !skillLevel || !campusLocation || !phoneNumber || !whatsappNumber || !department || !profilePictureUrl) {
       return res.status(400).json({ error: 'missing required provider fields' });
     }
 
     const profile = await createProviderProfile(req.user.userId, {
-      legalName, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl,
+      legalName,username, bio, skillLevel, campusLocation, phoneNumber, whatsappNumber, department, profilePictureUrl,
       socialLinks: socialLinks || [],
     });
 

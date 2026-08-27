@@ -15,10 +15,18 @@ async function createConsumerProfile(userId, { username, realName, campusLocatio
   });
 }
 
-async function createProviderProfile(userId, data) {
-  return prisma.providerProfile.create({
-    data: { userId, ...data },
+async function createProviderProfile(userId, { username, ...profileData }) {
+  return prisma.$transaction(async (tx) => {
+    const user = await tx.user.update({
+      where: { id: userId },
+      data: { username },
+    });
+
+    const profile = await tx.providerProfile.create({
+      data: { userId, ...profileData },
+    });
+
+    return { ...profile, username: user.username };
   });
 }
-
 module.exports = { createConsumerProfile, createProviderProfile };
