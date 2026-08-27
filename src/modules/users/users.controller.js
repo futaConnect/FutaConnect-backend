@@ -7,12 +7,12 @@ async function createMyConsumerProfile(req, res) {
       return res.status(403).json({ error: 'only consumer accounts can create a consumer profile' });
     }
 
-    const { realName, campusLocation, department } = req.body;
-    if (!realName || !campusLocation || !department) {
-      return res.status(400).json({ error: 'realName and campusLocation and department are required' });
+    const { realName, campusLocation, department,username } = req.body;
+    if (!realName || !campusLocation || !department || !username) {
+      return res.status(400).json({ error: 'realName and campusLocation and department and username are required' });
     }
 
-    const profile = await createConsumerProfile(req.user.userId, { realName, campusLocation });
+    const profile = await createConsumerProfile(req.user.userId, { realName, campusLocation, username, department });
     res.status(201).json(profile);
   } catch (err) {
     if (err.code === 'P2002') {
