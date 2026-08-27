@@ -1,5 +1,5 @@
 // src/modules/auth/auth.controller.js
-const { registerUser } = require('./auth.service');
+const { registerUser,loginUser } = require('./auth.service');
 
 async function register(req, res) {
   try {
@@ -22,4 +22,23 @@ async function register(req, res) {
   }
 }
 
-module.exports = { register };
+async function login(req, res) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'email and password are required' });
+    }
+
+    const token = await loginUser({ email, password });
+    res.json({ token });
+  } catch (err) {
+    if (err.message === 'INVALID_CREDENTIALS') {
+      return res.status(401).json({ error: 'invalid email or password' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { register, login };

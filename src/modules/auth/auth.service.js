@@ -1,6 +1,7 @@
 // src/modules/auth/auth.service.js
 const bcrypt = require('bcrypt');
 const prisma = require('../../config/db');
+const jwt = require('jsonwebtoken');
 
 // creates a new user with a hashed password — never store plain text passwords
 async function registerUser({ email, username, password, role }) {
@@ -16,4 +17,25 @@ async function registerUser({ email, username, password, role }) {
   return safeUser;
 }
 
-module.exports = { registerUser };
+// finds the user, checks the password, returns a signed token if valid
+async function loginUser({ email, password }) {
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    throw new Error('INVALID_CREDENTIALS'); // same error for wrong email or wrong password — don't reveal which
+  }
+
+  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+  if (!passwordMatches) {
+    throw new Error('INVALID_CREDENTIALS');
+  }
+
+  const token = jwt.sign(
+    { userId: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '7d' }
+  );
+
+  return token;
+}
+
+module.exports = { registerUser, loginUser  };
