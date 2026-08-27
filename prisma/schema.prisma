@@ -14,6 +14,18 @@ model User {
   passwordHash String
   role         Role
   createdAt    DateTime @default(now())
+  consumerProfile ConsumerProfile?
+}
+
+model ConsumerProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+
+  realName       String   // private — never shown to providers
+  campusLocation String
+
+  createdAt      DateTime @default(now())
 }
 
 enum Role {
