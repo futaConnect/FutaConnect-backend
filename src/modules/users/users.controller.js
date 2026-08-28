@@ -1,4 +1,4 @@
-const { createConsumerProfile, createProviderProfile } = require('./users.service');
+const { createConsumerProfile, createProviderProfile, getMyProfile } = require('./users.service');
 
 async function createMyConsumerProfile(req, res) {
   try {
@@ -50,4 +50,17 @@ async function createMyProviderProfile(req, res) {
   }
 }
 
-module.exports = { createMyConsumerProfile, createMyProviderProfile };
+async function getMe(req, res) {
+  try {
+    const profile = await getMyProfile(req.user.userId, req.user.role);
+    if (!profile) {
+      return res.status(404).json({ error: 'profile not yet created' });
+    }
+    res.json(profile);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { createMyConsumerProfile, createMyProviderProfile, getMe };

@@ -29,4 +29,20 @@ async function createProviderProfile(userId, { username, ...profileData }) {
     return { ...profile, username: user.username };
   });
 }
-module.exports = { createConsumerProfile, createProviderProfile };
+
+async function getMyProfile(userId, role) {
+  if (role === 'CONSUMER') {
+    const profile = await prisma.consumerProfile.findUnique({ where: { userId } });
+    if (!profile) return null;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return { ...profile, username: user.username, email: user.email };
+  }
+
+  if (role === 'PROVIDER') {
+    const profile = await prisma.providerProfile.findUnique({ where: { userId } });
+    if (!profile) return null;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    return { ...profile, username: user.username, email: user.email };
+  }
+}
+module.exports = { createConsumerProfile, createProviderProfile , getMyProfile};
