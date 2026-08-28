@@ -1,4 +1,4 @@
-const { createConsumerProfile, createProviderProfile, getMyProfile } = require('./users.service');
+const { createConsumerProfile, createProviderProfile, getMyProfile,updateConsumerProfile,updateProviderProfile } = require('./users.service');
 
 async function createMyConsumerProfile(req, res) {
   try {
@@ -63,4 +63,44 @@ async function getMe(req, res) {
   }
 }
 
-module.exports = { createMyConsumerProfile, createMyProviderProfile, getMe };
+async function updateMyConsumerProfile(req, res) {
+  try {
+    if (req.user.role !== 'CONSUMER') {
+      return res.status(403).json({ error: 'only consumer accounts can update a consumer profile' });
+    }
+
+    const { username, realName, campusLocation } = req.body; // department intentionally not accepted
+    const profile = await updateConsumerProfile(req.user.userId, { username, realName, campusLocation });
+    res.json(profile);
+  } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: 'username already taken' });
+    }
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'profile not found' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+async function updateMyProviderProfile(req, res) {
+  try {
+    if (req.user.role !== 'PROVIDER') {
+      return res.status(403).json({ error: 'only provider accounts can update a provider profile' });
+    }
+
+    const profile = await updateProviderProfile(req.user.userId, req.body);
+    res.json(profile);
+  } catch (err) {
+    if (err.code === 'P2002') {
+      return res.status(409).json({ error: 'username already taken' });
+    }
+    if (err.code === 'P2025') {
+      return res.status(404).json({ error: 'profile not found' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+module.exports = { createMyConsumerProfile, createMyProviderProfile, getMe ,updateMyConsumerProfile, updateMyProviderProfile};

@@ -45,4 +45,36 @@ async function getMyProfile(userId, role) {
     return { ...profile, username: user.username, email: user.email };
   }
 }
-module.exports = { createConsumerProfile, createProviderProfile , getMyProfile};
+
+async function updateConsumerProfile(userId, { username, realName, campusLocation }) {
+  return prisma.$transaction(async (tx) => {
+    if (username) {
+      await tx.user.update({ where: { id: userId }, data: { username } });
+    }
+
+    const profile = await tx.consumerProfile.update({
+      where: { userId },
+      data: { realName, campusLocation }, // department deliberately excluded — admin-only field
+    });
+
+    const user = await tx.user.findUnique({ where: { id: userId } });
+    return { ...profile, username: user.username };
+  });
+}
+
+async function updateProviderProfile(userId, { username, ...profileData }) {
+  return prisma.$transaction(async (tx) => {
+    if (username) {
+      await tx.user.update({ where: { id: userId }, data: { username } });
+    }
+
+    const profile = await tx.providerProfile.update({
+      where: { userId },
+      data: profileData,
+    });
+
+    const user = await tx.user.findUnique({ where: { id: userId } });
+    return { ...profile, username: user.username };
+  });
+}
+module.exports = { createConsumerProfile, createProviderProfile , getMyProfile, updateConsumerProfile, updateProviderProfile};
