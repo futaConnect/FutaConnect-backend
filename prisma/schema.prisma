@@ -67,9 +67,22 @@ model ProviderProfile {
   isVerified         Boolean             @default(false)
 
   createdAt          DateTime            @default(now())
+  niches ProviderNiche[]
 }
 
 model Niche {
   id   String @id @default(uuid())
   name String @unique
+  providerNiches ProviderNiche[]
+}
+
+model ProviderNiche {
+  id          String          @id @default(uuid())
+  providerId  String
+  provider    ProviderProfile @relation(fields: [providerId], references: [id])
+  nicheId     String
+  niche       Niche           @relation(fields: [nicheId], references: [id])
+  subServices String[]        @default([])
+
+  @@unique([providerId, nicheId])
 }
