@@ -68,3 +68,8 @@ model ProviderProfile {
 
   createdAt          DateTime            @default(now())
 }
+
+model Niche {
+  id   String @id @default(uuid())
+  name String @unique
+}
