@@ -1,4 +1,4 @@
-const { getAllNiches, addProviderNiche } = require('./niches.service');
+const { getAllNiches, addProviderNiche , removeProviderNiche} = require('./niches.service');
 
 async function listNiches(req, res) {
   try {
@@ -38,4 +38,24 @@ async function addMyNiche(req, res) {
   }
 }
 
-module.exports = { listNiches, addMyNiche };
+async function removeMyNiche(req, res) {
+  try {
+    if (req.user.role !== 'PROVIDER') {
+      return res.status(403).json({ error: 'only provider accounts can remove niches' });
+    }
+
+    await removeProviderNiche(req.user.userId, req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    if (err.message === 'PROFILE_NOT_FOUND') {
+      return res.status(404).json({ error: 'complete your provider profile first' });
+    }
+    if (err.message === 'NOT_YOURS') {
+      return res.status(403).json({ error: 'you cannot remove a niche that is not yours' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { listNiches, addMyNiche, removeMyNiche };
