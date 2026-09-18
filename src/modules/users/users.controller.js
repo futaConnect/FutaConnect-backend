@@ -66,7 +66,7 @@ async function getMe(req, res) {
 async function updateMyConsumerProfile(req, res) {
   try {
     if (req.user.role !== 'CONSUMER') {
-      return res.status(403).json({ error: 'only consumer accounts can update a consumer profile' });
+      return res.status(403).json({ error: 'onlyy consumer accounts can update a consumer profile' });
     }
 
     const { username, realName, campusLocation } = req.body; // department intentionally not accepted
