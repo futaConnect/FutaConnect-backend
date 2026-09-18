@@ -27,7 +27,7 @@ model ConsumerProfile {
   realName       String   // private — never shown to providers
   campusLocation String
   department     String   // private, admin-only — for scammer tracking (agreed w/ co-founder)
-
+  connects ConnectRequest[]
   createdAt      DateTime @default(now())
 }
 enum Role {
@@ -62,7 +62,7 @@ model ProviderProfile {
   socialLinks        String[]            @default([])
   department         String
   profilePictureUrl  String
-
+  connects ConnectRequest[]
   verificationTier   VerificationTier    @default(STEP3)
   isVerified         Boolean             @default(false)
 
@@ -74,6 +74,7 @@ model Niche {
   id   String @id @default(uuid())
   name String @unique
   providerNiches ProviderNiche[]
+  connects ConnectRequest[]
 }
 
 model ProviderNiche {
@@ -85,4 +86,26 @@ model ProviderNiche {
   subServices String[]        @default([])
 
   @@unique([providerId, nicheId])
+}
+
+enum ConnectStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model ConnectRequest {
+  id          String          @id @default(uuid())
+  consumerId  String
+  consumer    ConsumerProfile @relation(fields: [consumerId], references: [id])
+  providerId  String
+  provider    ProviderProfile @relation(fields: [providerId], references: [id])
+  nicheId     String
+  niche       Niche           @relation(fields: [nicheId], references: [id])
+
+  status      ConnectStatus   @default(PENDING)
+  requestedAt DateTime        @default(now())
+  respondedAt DateTime?
+  acceptedAt  DateTime?
 }
