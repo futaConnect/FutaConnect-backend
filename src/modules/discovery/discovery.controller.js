@@ -2,7 +2,8 @@ const { browseProviders } = require('./discovery.service');
 
 async function listProviders(req, res) {
   try {
-    const providers = await browseProviders();
+    const { location, availability, nicheId } = req.query;
+    const providers = await browseProviders({ location, availability, nicheId });
     res.json(providers);
   } catch (err) {
     console.error(err);
