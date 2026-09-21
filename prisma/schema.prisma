@@ -93,6 +93,8 @@ enum ConnectStatus {
   ACCEPTED
   REJECTED
   EXPIRED
+  COMPLETED
+  AUTO_CLOSED
 }
 
 model ConnectRequest {
@@ -108,4 +110,7 @@ model ConnectRequest {
   requestedAt DateTime        @default(now())
   respondedAt DateTime?
   acceptedAt  DateTime?
+  consumerMarkedDoneAt DateTime?
+  providerConfirmedAt  DateTime?
+  completedAt          DateTime?
 }

@@ -1,4 +1,4 @@
-const { createConnectRequest, getIncomingRequests , respondToRequest  } = require('./connects.service');
+const { createConnectRequest, getIncomingRequests , respondToRequest, markAsDone  } = require('./connects.service');
 
 async function createRequest(req, res) {
   try {
@@ -77,4 +77,27 @@ async function respond(req, res) {
   }
 }
 
-module.exports = { createRequest, listIncoming , respond};
+async function markDone(req, res) {
+  try {
+    if (req.user.role !== 'CONSUMER') {
+      return res.status(403).json({ error: 'only consumer accounts can mark a connect as done' });
+    }
+
+    const updated = await markAsDone(req.user.userId, req.params.id);
+    res.json(updated);
+  } catch (err) {
+    if (err.message === 'PROFILE_NOT_FOUND') {
+      return res.status(404).json({ error: 'complete your consumer profile first' });
+    }
+    if (err.message === 'NOT_YOURS') {
+      return res.status(403).json({ error: 'this request does not belong to you' });
+    }
+    if (err.message === 'INVALID_STATE') {
+      return res.status(409).json({ error: 'this connect cannot be marked done from its current state' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { createRequest, listIncoming , respond, markDone};

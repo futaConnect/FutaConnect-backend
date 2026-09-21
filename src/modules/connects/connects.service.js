@@ -79,4 +79,26 @@ async function respondToRequest(userId, connectRequestId, decision) {
     },
   });
 }
-module.exports = { createConnectRequest, getIncomingRequests, respondToRequest };
+
+async function markAsDone(userId, connectRequestId) {
+  const consumerProfile = await prisma.consumerProfile.findUnique({ where: { userId } });
+  if (!consumerProfile) {
+    throw new Error('PROFILE_NOT_FOUND');
+  }
+
+  const request = await prisma.connectRequest.findUnique({ where: { id: connectRequestId } });
+  if (!request || request.consumerId !== consumerProfile.id) {
+    throw new Error('NOT_YOURS');
+  }
+
+  if (request.status !== 'ACCEPTED') {
+    throw new Error('INVALID_STATE');
+  }
+
+  const now = new Date();
+  return prisma.connectRequest.update({
+    where: { id: connectRequestId },
+    data: { status: 'COMPLETED', consumerMarkedDoneAt: now, completedAt: now },
+  });
+}
+module.exports = { createConnectRequest, getIncomingRequests, respondToRequest ,markAsDone};
