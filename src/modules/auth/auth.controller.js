@@ -18,7 +18,7 @@ async function register(req, res) {
       return res.status(409).json({ error: `${err.meta.target} already in use` });
     }
     console.error(err);
-    res.status(500).json({ error: 'something went wrong' });
+    res.status(500).json({ error: 'something went wrongg' });
   }
 }
 
