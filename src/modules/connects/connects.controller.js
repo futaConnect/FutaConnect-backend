@@ -18,7 +18,7 @@ async function createRequest(req, res) {
       return res.status(404).json({ error: 'complete your consumer profile first' });
     }
     if (err.message === 'ACTIVE_REQUEST_EXISTS') {
-      return res.status(409).json({ error: 'you already have an active request in this niche' });
+      return res.status(409).json({ error: 'you already havee an active request in this niche' });
     }
     if (err.message === 'PROVIDER_NOT_AVAILABLE') {
       return res.status(404).json({ error: 'provider not found or not verified' });
