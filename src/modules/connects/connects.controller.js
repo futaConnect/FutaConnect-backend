@@ -64,7 +64,7 @@ async function respond(req, res) {
       return res.status(404).json({ error: 'complete your provider profile first' });
     }
     if (err.message === 'NOT_YOURS') {
-      return res.status(403).json({ error: 'this request does not belong to you' });
+      return res.status(403).json({ error: 'this request does not belong to youu' });
     }
     if (err.message === 'ALREADY_RESPONDED') {
       return res.status(409).json({ error: 'this request has already been responded to' });
