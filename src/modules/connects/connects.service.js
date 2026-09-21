@@ -27,4 +27,25 @@ async function createConnectRequest(userId, { providerId, nicheId }) {
   });
 }
 
-module.exports = { createConnectRequest };
+async function getIncomingRequests(userId) {
+  const providerProfile = await prisma.providerProfile.findUnique({ where: { userId } });
+  if (!providerProfile) {
+    throw new Error('PROFILE_NOT_FOUND');
+  }
+
+  return prisma.connectRequest.findMany({
+    where: { providerId: providerProfile.id },
+    include: {
+      consumer: {
+        select: {
+          campusLocation: true,
+          user: { select: { username: true } },
+        },
+      },
+      niche: true,
+    },
+    orderBy: { requestedAt: 'desc' },
+  });
+}
+
+module.exports = { createConnectRequest, getIncomingRequests };

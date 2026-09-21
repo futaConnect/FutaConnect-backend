@@ -1,4 +1,4 @@
-const { createConnectRequest } = require('./connects.service');
+const { createConnectRequest, getIncomingRequests  } = require('./connects.service');
 
 async function createRequest(req, res) {
   try {
@@ -28,4 +28,22 @@ async function createRequest(req, res) {
   }
 }
 
-module.exports = { createRequest };
+
+async function listIncoming(req, res) {
+  try {
+    if (req.user.role !== 'PROVIDER') {
+      return res.status(403).json({ error: 'only provider accounts can view incoming requests' });
+    }
+
+    const requests = await getIncomingRequests(req.user.userId);
+    res.json(requests);
+  } catch (err) {
+    if (err.message === 'PROFILE_NOT_FOUND') {
+      return res.status(404).json({ error: 'complete your provider profile first' });
+    }
+    console.error(err);
+    res.status(500).json({ error: 'something went wrong' });
+  }
+}
+
+module.exports = { createRequest, listIncoming };
