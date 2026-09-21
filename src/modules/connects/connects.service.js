@@ -48,4 +48,29 @@ async function getIncomingRequests(userId) {
   });
 }
 
-module.exports = { createConnectRequest, getIncomingRequests };
+async function respondToRequest(userId, connectRequestId, decision) {
+  const providerProfile = await prisma.providerProfile.findUnique({ where: { userId } });
+  if (!providerProfile) {
+    throw new Error('PROFILE_NOT_FOUND');
+  }
+
+  const request = await prisma.connectRequest.findUnique({ where: { id: connectRequestId } });
+  if (!request || request.providerId !== providerProfile.id) {
+    throw new Error('NOT_YOURS');
+  }
+
+  if (request.status !== 'PENDING') {
+    throw new Error('ALREADY_RESPONDED');
+  }
+
+  const now = new Date();
+  return prisma.connectRequest.update({
+    where: { id: connectRequestId },
+    data: {
+      status: decision, // 'ACCEPTED' or 'REJECTED'
+      respondedAt: now,
+      acceptedAt: decision === 'ACCEPTED' ? now : null,
+    },
+  });
+}
+module.exports = { createConnectRequest,  respondToRequest };
