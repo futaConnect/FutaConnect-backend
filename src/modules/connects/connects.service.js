@@ -73,4 +73,4 @@ async function respondToRequest(userId, connectRequestId, decision) {
     },
   });
 }
-module.exports = { createConnectRequest,  respondToRequest };
+module.exports = { createConnectRequest, getIncomingRequests, respondToRequest };
