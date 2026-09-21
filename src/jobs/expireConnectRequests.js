@@ -2,8 +2,7 @@ const cron = require('node-cron');
 const prisma = require('../config/db');
 
 async function expireStaleRequests() {
-//   const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-const tenMinutesAgo = new Date(Date.now() - 30 * 1000); // TEMP: 30 seconds for testing
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
   const result = await prisma.connectRequest.updateMany({
     where: {
@@ -20,8 +19,8 @@ const tenMinutesAgo = new Date(Date.now() - 30 * 1000); // TEMP: 30 seconds for 
 
 // runs every minute
 function startExpiryJob() {
-//   cron.schedule('* * * * *', expireStaleRequests);
-cron.schedule('*/10 * * * * *', expireStaleRequests); // TEMP: every 10s for testing
+  cron.schedule('* * * * *', expireStaleRequests);
+
 }
 
 module.exports = startExpiryJob;

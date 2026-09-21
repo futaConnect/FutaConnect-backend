@@ -23,6 +23,9 @@ async function createRequest(req, res) {
     if (err.message === 'PROVIDER_NOT_AVAILABLE') {
       return res.status(404).json({ error: 'provider not found or not verified' });
     }
+    if (err.message === 'NICHE_NOT_OFFERED') {
+  return res.status(400).json({ error: 'this provider does not offer that niche' });
+}
     console.error(err);
     res.status(500).json({ error: 'something went wrong' });
   }

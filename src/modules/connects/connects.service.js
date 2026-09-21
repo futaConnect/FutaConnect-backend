@@ -1,5 +1,4 @@
 const prisma = require('../../config/db');
-
 async function createConnectRequest(userId, { providerId, nicheId }) {
   const consumerProfile = await prisma.consumerProfile.findUnique({ where: { userId } });
   if (!consumerProfile) {
@@ -20,6 +19,13 @@ async function createConnectRequest(userId, { providerId, nicheId }) {
   const provider = await prisma.providerProfile.findUnique({ where: { id: providerId } });
   if (!provider || !provider.isVerified) {
     throw new Error('PROVIDER_NOT_AVAILABLE');
+  }
+
+  const offersThisNiche = await prisma.providerNiche.findUnique({
+    where: { providerId_nicheId: { providerId, nicheId } },
+  });
+  if (!offersThisNiche) {
+    throw new Error('NICHE_NOT_OFFERED');
   }
 
   return prisma.connectRequest.create({
